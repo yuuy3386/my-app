@@ -203,22 +203,29 @@ function selectCat(category, btn) {
   const list = data[category];
 
   document.getElementById("output").innerHTML = list.map(text => `
-    <div class="item" onclick="selectItem(this, '${text}')">
+    <div class="item" data-text="${text}">
       ${text}
     </div>
   `).join("");
+
+  // イベントをあとから付与（←これが安定ポイント）
+  document.querySelectorAll(".item").forEach(el => {
+    el.addEventListener("click", function() {
+      selectItem(this);
+    });
+  });
 
   document.getElementById("confirmArea").style.display = "none";
   document.getElementById("message").textContent = "";
 }
 
-function selectItem(el, text) {
+function selectItem(el) {
   document.querySelectorAll(".item").forEach(i => i.classList.remove("active"));
   el.classList.add("active");
 
-  selectedText = text;
+  selectedText = el.dataset.text;
 
-  document.getElementById("selectedTextDisplay").textContent = text;
+  document.getElementById("selectedTextDisplay").textContent = selectedText;
   document.getElementById("confirmArea").style.display = "block";
 }
 
