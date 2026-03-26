@@ -13,38 +13,12 @@ body {
     margin: 0;
     padding: 10px;
 }
+.container { max-width: 400px; margin: auto; }
+h1 { font-size: 24px; margin-bottom: 10px; }
+.sub { color: gray; font-size: 14px; }
+.url { font-weight: bold; margin: 15px 0; word-break: break-all; }
 
-.container {
-    max-width: 400px;
-    margin: auto;
-}
-
-/* タイトル */
-h1 {
-    font-size: 24px;
-    line-height: 1.3;
-    margin-bottom: 10px;
-}
-
-/* サブ */
-.sub {
-    color: gray;
-    font-size: 14px;
-}
-
-/* URL */
-.url {
-    font-weight: bold;
-    margin: 15px 0;
-    word-break: break-all;
-}
-
-/* ボタン */
-.buttons {
-    display: flex;
-    gap: 10px;
-    margin: 15px 0;
-}
+.buttons { display: flex; gap: 10px; margin: 15px 0; }
 
 button {
     flex: 1;
@@ -64,20 +38,13 @@ button {
     margin: 10px 0;
 }
 
-/* 結果 */
-h3 {
-    margin: 10px 0;
-}
-
 .result-box {
-    background: #ffffff;
+    background: #fff;
     border-radius: 16px;
     padding: 15px;
     margin: 10px 0;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* バー */
 .bar-bg {
     background: #ddd;
     border-radius: 10px;
@@ -91,20 +58,11 @@ h3 {
     position: relative;
 }
 
-/* %表示 */
 .percent {
     position: absolute;
     right: 5px;
     top: -20px;
     font-size: 12px;
-    color: #333;
-}
-
-/* 注意文 */
-.note {
-    color: gray;
-    font-size: 12px;
-    margin-top: 10px;
 }
 </style>
 </head>
@@ -117,46 +75,81 @@ h3 {
 <p class="sub">直感でポチッと（あとから変更OK）</p>
 
 <p>このURLを共有</p>
-<p class="url">http://127.0.0.1:5001/</p>
+<p class="url" id="url"></p>
 
-<form method="POST" action="/">
-    <div class="buttons">
-        <button class="onsen" name="choice" value="温泉">温泉</button>
-        <button class="food" name="choice" value="食べ歩き">食べ歩き</button>
-    </div>
-</form>
+<div class="buttons">
+    <button class="onsen" onclick="vote('onsen')">温泉</button>
+    <button class="food" onclick="vote('food')">食べ歩き</button>
+</div>
 
-<button class="reset" onclick="location.href='/reset'">リセット</button>
+<button class="reset" onclick="resetVote()">リセット</button>
 
 <h3>結果</h3>
 
-{% set total = onsen + food %}
-
-<!-- 温泉 -->
-{% set onsen_percent = (onsen * 100 // total) if total > 0 else 0 %}
 <div class="result-box">
-    <p>温泉（{{ onsen }}票）</p>
+    <p>温泉（<span id="onsen">0</span>票）</p>
     <div class="bar-bg">
-        <div class="bar" style="width: {{ onsen_percent }}%; background:#5b8bd0;">
-            <span class="percent">{{ onsen_percent }}%</span>
+        <div id="onsenBar" class="bar" style="background:#5b8bd0;">
+            <span id="onsenPercent" class="percent">0%</span>
         </div>
     </div>
 </div>
 
-<!-- 食べ歩き -->
-{% set food_percent = (food * 100 // total) if total > 0 else 0 %}
 <div class="result-box">
-    <p>食べ歩き（{{ food }}票）</p>
+    <p>食べ歩き（<span id="food">0</span>票）</p>
     <div class="bar-bg">
-        <div class="bar" style="width: {{ food_percent }}%; background:#5fbf7a;">
-            <span class="percent">{{ food_percent }}%</span>
+        <div id="foodBar" class="bar" style="background:#5fbf7a;">
+            <span id="foodPercent" class="percent">0%</span>
         </div>
     </div>
 </div>
 
-<p class="note">※現在の途中結果です（人数が増えると変動します）</p>
-
 </div>
+
+<script>
+let onsen = localStorage.getItem("onsen") || 0;
+let food = localStorage.getItem("food") || 0;
+
+function vote(type) {
+    if(type === "onsen") onsen++;
+    if(type === "food") food++;
+    save();
+    update();
+}
+
+function resetVote() {
+    onsen = 0;
+    food = 0;
+    save();
+    update();
+}
+
+function save() {
+    localStorage.setItem("onsen", onsen);
+    localStorage.setItem("food", food);
+}
+
+function update() {
+    document.getElementById("onsen").innerText = onsen;
+    document.getElementById("food").innerText = food;
+
+    let total = Number(onsen) + Number(food);
+
+    let onsenPercent = total ? Math.floor(onsen * 100 / total) : 0;
+    let foodPercent = total ? Math.floor(food * 100 / total) : 0;
+
+    document.getElementById("onsenBar").style.width = onsenPercent + "%";
+    document.getElementById("foodBar").style.width = foodPercent + "%";
+
+    document.getElementById("onsenPercent").innerText = onsenPercent + "%";
+    document.getElementById("foodPercent").innerText = foodPercent + "%";
+}
+
+// URL表示
+document.getElementById("url").innerText = location.href;
+
+update();
+</script>
 
 </body>
 </html>
