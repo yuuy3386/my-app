@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel投票</title>
+
+<style>
+body {
+    font-family: sans-serif;
+    background: #eef2f7;
+    text-align: center;
+    margin: 0;
+    padding: 10px;
+}
+
+.container {
+    max-width: 400px;
+    margin: auto;
+}
+
+/* タイトル */
+h1 {
+    font-size: 24px;
+    line-height: 1.3;
+    margin-bottom: 10px;
+}
+
+/* サブ */
+.sub {
+    color: gray;
+    font-size: 14px;
+}
+
+/* URL */
+.url {
+    font-weight: bold;
+    margin: 15px 0;
+    word-break: break-all;
+}
+
+/* ボタン */
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+button {
+    flex: 1;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    color: white;
+}
+
+.onsen { background: #5b8bd0; }
+.food { background: #5fbf7a; }
+
+.reset {
+    background: #e25745;
+    width: 100%;
+    margin: 10px 0;
+}
+
+/* 結果 */
+h3 {
+    margin: 10px 0;
+}
+
+.result-box {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* バー */
+.bar-bg {
+    background: #ddd;
+    border-radius: 10px;
+    height: 12px;
+    margin-top: 8px;
+}
+
+.bar {
+    height: 12px;
+    border-radius: 10px;
+    position: relative;
+}
+
+/* %表示 */
+.percent {
+    position: absolute;
+    right: 5px;
+    top: -20px;
+    font-size: 12px;
+    color: #333;
+}
+
+/* 注意文 */
+.note {
+    color: gray;
+    font-size: 12px;
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>どっち行く？Travel投票</h1>
+<p class="sub">直感でポチッと（あとから変更OK）</p>
+
+<p>このURLを共有</p>
+<p class="url">http://127.0.0.1:5001/</p>
+
+<form method="POST" action="/">
+    <div class="buttons">
+        <button class="onsen" name="choice" value="温泉">温泉</button>
+        <button class="food" name="choice" value="食べ歩き">食べ歩き</button>
+    </div>
+</form>
+
+<button class="reset" onclick="location.href='/reset'">リセット</button>
+
+<h3>結果</h3>
+
+{% set total = onsen + food %}
+
+<!-- 温泉 -->
+{% set onsen_percent = (onsen * 100 // total) if total > 0 else 0 %}
+<div class="result-box">
+    <p>温泉（{{ onsen }}票）</p>
+    <div class="bar-bg">
+        <div class="bar" style="width: {{ onsen_percent }}%; background:#5b8bd0;">
+            <span class="percent">{{ onsen_percent }}%</span>
+        </div>
+    </div>
+</div>
+
+<!-- 食べ歩き -->
+{% set food_percent = (food * 100 // total) if total > 0 else 0 %}
+<div class="result-box">
+    <p>食べ歩き（{{ food }}票）</p>
+    <div class="bar-bg">
+        <div class="bar" style="width: {{ food_percent }}%; background:#5fbf7a;">
+            <span class="percent">{{ food_percent }}%</span>
+        </div>
+    </div>
+</div>
+
+<p class="note">※現在の途中結果です（人数が増えると変動します）</p>
+
+</div>
+
+</body>
+</html>
