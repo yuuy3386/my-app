@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>会話生成ツール</title>
+
+<style>
+    body {
+      font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+      background: #eef2f7;
+      padding: 10px;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .container {
+      max-width: 420px;
+      width: 100%;
+      background: white;
+      padding: 18px;
+      border-radius: 16px;
+    }
+    
+    h1 {
+      text-align: center;
+      color: #2f4a6d;
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+    
+    .sub {
+      text-align: center;
+      color: #777;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .categories {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    
+    .cat-btn {
+      padding: 6px 10px;
+      border-radius: 14px;
+      border: none;
+      background: #e0e6ef;
+      font-size: 12px;
+    }
+    
+    .cat-btn.active {
+      background: #5b8def;
+      color: white;
+    }
+    
+    .result {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 12px;
+    }
+    
+    .item {
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      border-left: 4px solid #5b8def;
+      font-size: 13px;
+    }
+    
+    /* アクション */
+    .actions {
+      margin-top: 10px;
+      text-align: center;
+    }
+    
+    button.action {
+      margin: 4px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+    
+    .copy { background: #63c27d; color: white; }
+    .send { background: #f4a261; color: white; }
+    
+    .message {
+      margin-top: 8px;
+      text-align: center;
+      color: #2f4a6d;
+      font-size: 12px;
+    }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>会話生成ツール</h1>
+<p class="sub">相手に伝わる、やさしい一言</p>
+
+<div class="categories">
+  <button class="cat-btn" onclick="selectCat('労い', this)">労い</button>
+  <button class="cat-btn" onclick="selectCat('気遣い', this)">気遣い</button>
+  <button class="cat-btn" onclick="selectCat('安心', this)">安心</button>
+  <button class="cat-btn" onclick="selectCat('前向き', this)">前向き</button>
+  <button class="cat-btn" onclick="selectCat('締め', this)">締め</button>
+</div>
+
+<div class="result" id="output"></div>
+
+<div class="actions" id="actions" style="display:none;">
+  <p>この内容をどうしますか？</p>
+  <button class="action copy" onclick="copyText()">コピー</button>
+  <button class="action send" onclick="sendText()">送信</button>
+</div>
+
+<div class="message" id="message"></div>
+
+</div>
+
+<script>
+const data = {
+
+  労い: [
+    "お力添えをいただき感謝しております。",
+    "ご尽力いただきありがとうございました。",
+    "いつもありがとうございます。",
+    "ご対応いただき大変助かりました。"
+  ],
+
+  気遣い: [
+    "季節の変わり目ですので、どうぞご自愛ください。",
+    "無理のない範囲で進めてください。",
+    "お忙しいところ恐縮ですが。",
+    "お返事には及びませんので、一読いただけますと幸いです。",
+    "〇〇様の体調を最優先になさってください。"
+  ],
+
+  安心: [
+    "お手隙の際で構いません。",
+    "急ぎではございませんのでご安心ください。",
+    "責任を持って対応いたします。",
+    "お手数おかけいたします。",
+    "ご不明な点がございましたら、お気軽にお申し付けください。"
+  ],
+
+  前向き: [
+    "勉強になります。",
+    "成長の機会をいただきありがとうございます。",
+    "大変参考になります。",
+    "学ばせていただいております。",
+    "今後に活かしてまいります。"
+  ],
+
+  締め: [
+    "引き続きよろしくお願いいたします。",
+    "本日もお疲れ様でした。",
+    "ご期待に添えず申し訳ありません。",
+    "今回は見送らせていただきたいと存じます。",
+    "いま一度のご確認をお願いいたします。"
+  ]
+
+};
+
+let selectedText = "";
+
+function selectCat(category, btn) {
+  document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+
+  const list = data[category];
+
+  document.getElementById("output").innerHTML = list.map(text => `
+    <div class="item" onclick="selectItem(this, '${text}')">
+      ${text}
+    </div>
+  `).join("");
+
+  document.getElementById("actions").style.display = "none";
+  document.getElementById("message").textContent = "";
+}
+
+function selectItem(el, text) {
+  document.querySelectorAll(".item").forEach(i => i.classList.remove("active"));
+  el.classList.add("active");
+
+  selectedText = text;
+  document.getElementById("actions").style.display = "block";
+}
+
+function copyText() {
+  navigator.clipboard.writeText(selectedText);
+  document.getElementById("message").textContent = "コピーしました";
+}
+
+function sendText() {
+  document.getElementById("message").textContent = "送信しました";
+}
+</script>
+
+</body>
+</html>
