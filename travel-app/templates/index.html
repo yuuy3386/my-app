@@ -1,1 +1,296 @@
-<h1>OK画面</h1>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+
+<!-- 🔥 スマホ対応の核 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>トラベルアンケート</title>
+
+<style>
+body {
+  font-family: sans-serif;
+  text-align: center;
+  background: #f5f6f8;
+  margin: 0;
+  padding: 0 0 40px;
+}
+
+h1 {
+  margin-top: 24px;
+  font-size: 26px;
+}
+
+p {
+  font-size: 16px;
+}
+
+.box {
+  background: #f3e3c4;
+  border: 3px solid #d79b00;
+  border-radius: 24px;
+  padding: 24px 16px 32px;
+  width: 80%;
+  margin: 16px auto 24px;
+}
+
+button {
+  border: none;
+  border-radius: 20px;
+  padding: 16px;
+  font-size: 18px;
+  margin: 8px;
+  cursor: pointer;
+}
+
+.onsen {
+  background: #6d8fc8;
+  color: white;
+  width: 40%;
+}
+
+.food {
+  background: #84bc7e;
+  color: white;
+  width: 40%;
+}
+
+.gray {
+  background: #8e8e8e;
+  color: white;
+  width: 80%;
+}
+
+.finish {
+  background: #111;
+  color: white;
+  width: 80%;
+}
+
+.finish.active {
+  background: red;
+}
+
+.selected {
+  outline: 3px solid #ffcc00;
+}
+
+.bar-bg {
+  width: 80%;
+  height: 18px;
+  background: #ddd;
+  border-radius: 20px;
+  margin: 8px auto 20px;
+}
+
+.bar {
+  height: 18px;
+  border-radius: 20px;
+}
+
+.blue { background: #6d8fc8; }
+.green { background: #84bc7e; }
+
+#nameInput {
+  width: 80%;
+  padding: 10px;
+  font-size: 16px;
+}
+
+#message {
+  display: none;
+  margin-top: 16px;
+}
+
+/* 🔥 スマホ最適化 */
+@media screen and (max-width: 600px) {
+
+  .onsen, .food {
+    width: 80%;
+  }
+
+  .gray, .finish {
+    width: 90%;
+  }
+
+  .box {
+    width: 92%;
+  }
+
+  #nameInput {
+    width: 90%;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<h1>トラベルアンケート</h1>
+<p>どちらに行くか決めるため投票をお願いします</p>
+
+<div class="box">
+  <h3 id="deadlineText">締め切り：未設定</h3>
+
+  <input type="date" id="dateInput">
+  <select id="timeInput"></select>
+
+  <br>
+
+  <button type="button" onclick="setDeadline()" style="background:#d4a232;color:white;">設定</button>
+</div>
+
+<p>名前を記入してください：</p>
+<input id="nameInput" placeholder="名前を入力">
+
+<br>
+
+<button type="button" id="onsenBtn" class="onsen">温泉</button>
+<button type="button" id="foodBtn" class="food">食べ歩き</button>
+
+<br>
+
+<button type="button" class="gray" onclick="showImage()">イメージ表示</button>
+<br>
+<button type="button" class="gray" onclick="resetChoice()">回答をやり直す</button>
+
+<br>
+
+<button type="button" class="finish" id="finishBtn">完了</button>
+
+<h2>結果</h2>
+
+<p>温泉 <span id="onsenText">0%</span></p>
+<div class="bar-bg">
+  <div id="onsenBar" class="bar blue" style="width:0%"></div>
+</div>
+
+<p>食べ歩き <span id="foodText">0%</span></p>
+<div class="bar-bg">
+  <div id="foodBar" class="bar green" style="width:0%"></div>
+</div>
+
+<p id="message">回答ありがとうございました</p>
+
+<script>
+
+// 時間生成
+document.addEventListener("DOMContentLoaded", function() {
+  for (let i = 0; i < 24; i++) {
+    let h = String(i).padStart(2,"0");
+    let opt = document.createElement("option");
+    opt.value = h + ":00";
+    opt.text = h + ":00";
+    document.getElementById("timeInput").appendChild(opt);
+  }
+});
+
+let selectedChoice = null;
+
+// 温泉
+onsenBtn.onclick = function() {
+  selectedChoice = "onsen";
+
+  this.classList.add("selected");
+  foodBtn.classList.remove("selected");
+
+  onsenBar.style.width = "100%";
+  foodBar.style.width = "0%";
+
+  onsenText.innerText = "100%";
+  foodText.innerText = "0%";
+
+  resetFinish();
+};
+
+// 食べ歩き
+foodBtn.onclick = function() {
+  selectedChoice = "food";
+
+  this.classList.add("selected");
+  onsenBtn.classList.remove("selected");
+
+  onsenBar.style.width = "0%";
+  foodBar.style.width = "100%";
+
+  onsenText.innerText = "0%";
+  foodText.innerText = "100%";
+
+  resetFinish();
+};
+
+function showImage() {
+  selectedChoice = null;
+
+  onsenBar.style.width = "40%";
+  foodBar.style.width = "60%";
+
+  onsenText.innerText = "40%";
+  foodText.innerText = "60%";
+
+  onsenBtn.classList.remove("selected");
+  foodBtn.classList.remove("selected");
+
+  resetFinish();
+}
+
+function resetChoice() {
+  selectedChoice = null;
+
+  onsenBar.style.width = "0%";
+  foodBar.style.width = "0%";
+
+  onsenText.innerText = "0%";
+  foodText.innerText = "0%";
+
+  onsenBtn.classList.remove("selected");
+  foodBtn.classList.remove("selected");
+
+  resetFinish();
+}
+
+function resetFinish() {
+  finishBtn.classList.remove("active");
+  message.style.display = "none";
+}
+
+// 完了
+finishBtn.onclick = function() {
+
+  if (!selectedChoice) {
+    alert("選択してください");
+    return;
+  }
+
+  this.classList.add("active");
+
+  const name = nameInput.value || "未入力";
+
+  fetch("/vote", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ name:name, choice:selectedChoice })
+  })
+  .then(()=> {
+    message.style.display = "block";
+  });
+};
+
+// 日付
+function setDeadline() {
+  const d = dateInput.value;
+  const t = timeInput.value;
+
+  if (!d) return;
+
+  const f = d.replaceAll("-", "/");
+
+  deadlineText.innerText = "締め切り：" + f + " " + t;
+}
+
+</script>
+
+</body>
+</html>
